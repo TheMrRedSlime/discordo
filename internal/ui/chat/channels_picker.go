@@ -97,8 +97,37 @@ func (cp *channelsPicker) update() {
 	cp.Model.SetItems(items)
 }
 
+func (cp *channelsPicker) getStatusIcon(channel discord.Channel) string {
+	// Only 1-on-1 DMs have a single clear status
+	if channel.Type != discord.DirectMessage || len(channel.DMRecipients) == 0 {
+		return ""
+	}
+
+	recipientID := channel.DMRecipients[0].ID
+	presence, err := cp.chatView.state.Cabinet.Presence(0, recipientID) // GuildID 0 for DMs
+	if err != nil {
+		return "⚪" // Offline/Unknown
+	}
+
+	switch presence.Status {
+	case discord.OnlineStatus:
+		return "🟢"
+	case discord.DoNotDisturbStatus:
+		return "🔴"
+	case discord.IdleStatus:
+		return "🟡"
+	default:
+		return "⚪"
+	}
+}
+
 func (cp *channelsPicker) channelItem(guild *discord.Guild, channel discord.Channel) picker.Item {
 	var b strings.Builder
+
+	if status := cp.getStatusIcon(channel); status != "" {
+		b.WriteString(status + " ")
+	}
+
 	b.WriteString(ui.ChannelToString(channel, cp.chatView.cfg.Icons, cp.chatView.state))
 
 	if guild != nil {
