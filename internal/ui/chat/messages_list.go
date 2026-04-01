@@ -387,7 +387,7 @@ func (ml *messagesList) drawAuthor(builder *tview.LineBuilder, message discord.M
 	if err == nil {
 		switch presence.Status {
 		case discord.OnlineStatus:
-			foreground = color.Lime
+			foreground = color.Green
 		case discord.DoNotDisturbStatus:
 			foreground = color.OrangeRed
 		case discord.IdleStatus:
