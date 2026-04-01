@@ -202,6 +202,21 @@ func (gt *guildsTree) channelNodeStyle(channel discord.Channel) tcell.Style {
 	return ui.MergeStyle(gt.dmStatusStyle(presence.Status), unread)
 }
 
+func (gt *guildsTree) updateChannelStyle(id discord.ChannelID) {
+	node, ok := gt.channelNodeByID[id]
+	if !ok {
+		return
+	}
+
+	channel, err := gt.chat.state.Cabinet.Channel(id)
+	if err != nil {
+		return
+	}
+
+	style := gt.channelNodeStyle(*channel)
+	gt.setNodeLineStyle(node, style)
+}
+
 func (gt *guildsTree) dmStatusStyle(status discord.Status) tcell.Style {
 	switch status {
 	case discord.DoNotDisturbStatus:

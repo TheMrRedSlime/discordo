@@ -263,6 +263,8 @@ func (m *Model) HandleEvent(event tview.Event) tview.Command {
 			m.onMessageUpdate(event)
 		case *gateway.MessageDeleteEvent:
 			m.onMessageDelete(event)
+		case *gateway.PresenceUpdateEvent:
+			m.onPresenceUpdate(event)
 
 		case *gateway.GuildMembersChunkEvent:
 			m.onGuildMembersChunk(event)

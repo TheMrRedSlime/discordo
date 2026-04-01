@@ -108,6 +108,22 @@ func (m *Model) onMessageCreate(message *gateway.MessageCreateEvent) tview.Comma
 	return m.notify(*message)
 }
 
+func (m *Model) onPresenceUpdate(presence *gateway.PresenceUpdateEvent) {
+	channels, err := m.state.PrivateChannels()
+	if err != nil {
+		return
+	}
+
+	for _, c := range channels {
+		if c.Type == discord.DirectMessage && len(c.DMRecipients) > 0 {
+			if c.DMRecipients[0].ID == presence.User.ID {
+				m.guildsTree.updateChannelStyle(c.ID)
+				return
+			}
+		}
+	}
+}
+
 func (m *Model) notify(message gateway.MessageCreateEvent) tview.Command {
 	return func() tview.Event {
 		if err := notifications.Notify(m.state, message, m.cfg); err != nil {
