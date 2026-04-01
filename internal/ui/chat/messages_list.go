@@ -29,6 +29,7 @@ import (
 	"github.com/diamondburned/arikawa/v3/api"
 	"github.com/diamondburned/arikawa/v3/discord"
 	"github.com/diamondburned/arikawa/v3/gateway"
+	"github.com/diamondburned/arikawa/v3/state"
 	"github.com/diamondburned/arikawa/v3/utils/json/option"
 	"github.com/diamondburned/ningen/v3/discordmd"
 	"github.com/gdamore/tcell/v3"
@@ -394,6 +395,22 @@ func (ml *messagesList) drawAuthor(builder *tview.LineBuilder, message discord.M
 			foreground = color.Yellow
 		default:
 			foreground = color.Grey
+		}
+	}
+
+	if ml.cfg.ServerRoleColor == true {
+		if member := ml.memberForMessage(message); member != nil {
+			if member.Nick != "" {
+				name = member.Nick
+			}
+
+			color, ok := state.MemberColor(member, func(id discord.RoleID) *discord.Role {
+				r, _ := ml.chatView.state.Cabinet.Role(message.GuildID, id)
+				return r
+			})
+			if ok {
+				foreground = tcell.NewHexColor(int32(color))
+			}
 		}
 	}
 

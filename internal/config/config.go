@@ -85,9 +85,10 @@ type (
 	}
 
 	Config struct {
-		AutoFocus bool   `toml:"auto_focus"`
-		Mouse     bool   `toml:"mouse"`
-		Editor    string `toml:"editor"`
+		AutoFocus       bool   `toml:"auto_focus"`
+		ServerRoleColor bool   `toml:"server_role_color"`
+		Mouse           bool   `toml:"mouse"`
+		Editor          string `toml:"editor"`
 
 		Status              discord.Status `toml:"status"`
 		HideBlockedUsers    bool           `toml:"hide_blocked_users"`

@@ -2,6 +2,9 @@
 # Set to false to preview channels without moving focus.
 auto_focus = true
 
+#Whether the user's name should be colored based on their role or only their online status
+server_role_color = false
+
 # Whether to enable mouse or not.
 mouse = true
 # The program to open when the `message_input.editor` keybind is pressed. Set the value to `"default"` to use `$EDITOR`.
