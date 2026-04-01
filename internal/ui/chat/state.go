@@ -109,6 +109,9 @@ func (m *Model) onMessageCreate(message *gateway.MessageCreateEvent) tview.Comma
 }
 
 func (m *Model) onPresenceUpdate(presence *gateway.PresenceUpdateEvent) {
+
+	m.messagesList.updatePresenceForUser(presence.User.ID)
+
 	channels, err := m.state.PrivateChannels()
 	if err != nil {
 		return

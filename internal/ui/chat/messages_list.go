@@ -415,6 +415,16 @@ func (ml *messagesList) drawAuthor(builder *tview.LineBuilder, message discord.M
 	builder.Write(name+" ", style)
 }
 
+func (ml *messagesList) updatePresenceForUser(userID discord.UserID) {
+	for _, msg := range ml.messages {
+		if msg.Author.ID == userID {
+			delete(ml.itemByID, msg.ID)
+		}
+	}
+	ml.SetBuilder(ml.buildItem)
+
+}
+
 func (ml *messagesList) memberForMessage(message discord.Message) *discord.Member {
 	// Webhooks do not have nicknames or roles.
 	if !message.GuildID.IsValid() || message.WebhookID.IsValid() {
