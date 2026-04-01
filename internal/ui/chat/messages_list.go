@@ -397,6 +397,19 @@ func (ml *messagesList) drawAuthor(builder *tview.LineBuilder, message discord.M
 			foreground = tcell.NewHexColor(int32(color))
 		}
 	}
+	presence, err := ml.chatView.state.Presence(message.GuildID, message.Author.ID)
+	if err == nil {
+		switch presence.Status {
+		case discord.OnlineStatus:
+			foreground = color.Lime
+		case discord.DoNotDisturbStatus:
+			foreground = color.OrangeRed
+		case discord.IdleStatus:
+			foreground = color.Yellow
+		default:
+			foreground = color.Default
+		}
+	}
 
 	style := baseStyle.Foreground(foreground).Bold(true)
 	builder.Write(name+" ", style)
