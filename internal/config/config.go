@@ -138,15 +138,16 @@ func Load(path string) (*Config, error) {
 		return nil, fmt.Errorf("failed to unmarshal default config: %w", err)
 	}
 
+	slog.Info("loading config", "path", path)
 	file, err := os.Open(path)
 	if os.IsNotExist(err) {
-		slog.Info(
-			"config file does not exist, falling back to the default config",
-			"path",
-			path,
-			"err",
-			err,
-		)
+		if err := os.MkdirAll(filepath.Dir(path), os.ModePerm); err != nil {
+			return nil, fmt.Errorf("failed to create config dir: %w", err)
+		}
+		if err := os.WriteFile(path, defaultCfg, 0644); err != nil {
+			return nil, fmt.Errorf("failed to write default config: %w", err)
+		}
+		slog.Info("created default config file", "path", path)
 	} else {
 		if err != nil {
 			return nil, fmt.Errorf("failed to open config file: %w", err)
