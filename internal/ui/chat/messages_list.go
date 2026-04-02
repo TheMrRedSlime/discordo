@@ -48,8 +48,9 @@ type messagesList struct {
 	messages []discord.Message
 	// rows is the virtual list model rendered by tview (message rows +
 	// date-separator rows). It is rebuilt lazily when rowsDirty is true.
-	rows      []messagesListRow
-	rowsDirty bool
+	rows       []messagesListRow
+	deletedIDs map[discord.MessageID]bool
+	rowsDirty  bool
 
 	renderer *markdown.Renderer
 	// itemByID caches unselected message TextViews.
@@ -82,11 +83,12 @@ type messagesListRow struct {
 
 func newMessagesList(cfg *config.Config, chatView *Model) *messagesList {
 	ml := &messagesList{
-		Model:    list.NewModel(),
-		cfg:      cfg,
-		chatView: chatView,
-		renderer: markdown.NewRenderer(cfg),
-		itemByID: make(map[discord.MessageID]*tview.TextView),
+		Model:      list.NewModel(),
+		deletedIDs: make(map[discord.MessageID]bool),
+		cfg:        cfg,
+		chatView:   chatView,
+		renderer:   markdown.NewRenderer(cfg),
+		itemByID:   make(map[discord.MessageID]*tview.TextView),
 	}
 	ml.attachmentsPicker = newAttachmentsPicker(cfg, chatView)
 
@@ -113,6 +115,7 @@ func (ml *messagesList) reset() {
 	ml.messages = nil
 	ml.rows = nil
 	ml.rowsDirty = false
+	clear(ml.deletedIDs)
 	clear(ml.itemByID)
 	ml.
 		Clear().
@@ -348,6 +351,10 @@ func (ml *messagesList) writeMessage(builder *tview.LineBuilder, message discord
 			builder.Write("Blocked message", baseStyle.Foreground(color.Red).Bold(true))
 			return
 		}
+	}
+
+	if ml.deletedIDs[message.ID] {
+		baseStyle = baseStyle.Foreground(color.OrangeRed).StrikeThrough(true)
 	}
 
 	switch message.Type {

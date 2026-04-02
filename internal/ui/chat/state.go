@@ -165,37 +165,44 @@ func (m *Model) onMessageDelete(message *gateway.MessageDeleteEvent) {
 		return
 	}
 
-	if selectedChannel.ID == message.ChannelID {
-		prevCursor := m.messagesList.Cursor()
-		deletedIndex := slices.IndexFunc(m.messagesList.messages, func(m discord.Message) bool {
-			return m.ID == message.ID
-		})
-		if deletedIndex < 0 {
-			return
-		}
+	if selectedChannel.ID != message.ChannelID {
+		return
+	}
 
-		m.messagesList.deleteMessage(deletedIndex)
+	deletedIndex := slices.IndexFunc(m.messagesList.messages, func(msg discord.Message) bool {
+		return msg.ID == message.ID
+	})
+	if deletedIndex < 0 {
+		return
+	}
 
-		// Keep cursor stable when possible after removal.
-		newCursor := prevCursor
-		if prevCursor == deletedIndex {
-			// Prefer previous item; fall forward if we deleted the first.
-			newCursor = deletedIndex - 1
-			if newCursor < 0 {
-				if deletedIndex < len(m.messagesList.messages) {
-					newCursor = deletedIndex
-				} else {
-					newCursor = -1
-				}
+	//show deleted messages
+
+	if m.cfg.ShowDeletedMessages {
+		m.messagesList.deletedIDs[message.ID] = true
+		delete(m.messagesList.itemByID, message.ID)
+		m.messagesList.invalidateRows()
+		return
+	}
+
+	prevCursor := m.messagesList.Cursor()
+	m.messagesList.deleteMessage(deletedIndex)
+
+	newCursor := prevCursor
+	if prevCursor == deletedIndex {
+		newCursor = deletedIndex - 1
+		if newCursor < 0 {
+			if deletedIndex < len(m.messagesList.messages) {
+				newCursor = deletedIndex
+			} else {
+				newCursor = -1
 			}
-		} else if prevCursor > deletedIndex {
-			// Shift back since the list shrank before the cursor.
-			newCursor = prevCursor - 1
 		}
-		if newCursor != prevCursor {
-			// Avoid redundant cursor updates if nothing changed.
-			m.messagesList.SetCursor(newCursor)
-		}
+	} else if prevCursor > deletedIndex {
+		newCursor = prevCursor - 1
+	}
+	if newCursor != prevCursor {
+		m.messagesList.SetCursor(newCursor)
 	}
 }
 
