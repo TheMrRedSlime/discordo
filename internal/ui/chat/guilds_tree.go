@@ -3,6 +3,7 @@ package chat
 import (
 	"fmt"
 	"log/slog"
+	"slices"
 
 	"github.com/ayn2op/discordo/internal/clipboard"
 	"github.com/ayn2op/discordo/internal/config"
@@ -314,6 +315,17 @@ func (gt *guildsTree) createChannelNodes(node *tview.TreeNode, channels []discor
 	}
 }
 
+func (gt *guildsTree) promoteDMChannel(channelID discord.ChannelID) {
+	node, ok := gt.channelNodeByID[channelID]
+	if !ok || gt.dmRootNode == nil {
+		return
+	}
+
+	gt.dmRootNode.RemoveChild(node)
+	children := gt.dmRootNode.GetChildren()
+	gt.dmRootNode.SetChildren(append([]*tview.TreeNode{node}, children...))
+}
+
 func (gt *guildsTree) onSelected(node *tview.TreeNode) tview.Command {
 	if len(node.GetChildren()) != 0 {
 		node.SetExpanded(!node.IsExpanded())
@@ -375,6 +387,18 @@ func (gt *guildsTree) onSelected(node *tview.TreeNode) tview.Command {
 			slog.Error("failed to get private channels", "err", err)
 			return nil
 		}
+
+		slices.SortFunc(channels, func(a, b discord.Channel) int {
+			if a.LastMessageID < b.LastMessageID {
+				return 1
+			}
+			if a.LastMessageID > b.LastMessageID {
+				return -1
+			}
+			return 0
+		})
+
+		gt.dmRootNode = node
 
 		ui.SortPrivateChannels(channels)
 		for _, c := range channels {

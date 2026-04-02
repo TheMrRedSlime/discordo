@@ -99,6 +99,10 @@ func (m *Model) onReady(event *gateway.ReadyEvent) tview.Command {
 
 func (m *Model) onMessageCreate(message *gateway.MessageCreateEvent) tview.Command {
 	selectedChannel := m.SelectedChannel()
+	if !message.GuildID.IsValid() {
+		m.guildsTree.promoteDMChannel(message.ChannelID)
+	}
+
 	if selectedChannel != nil && selectedChannel.ID == message.ChannelID {
 		m.removeTyper(message.Author.ID)
 		m.messagesList.addMessage(message.Message)
