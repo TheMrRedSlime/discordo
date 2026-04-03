@@ -427,10 +427,18 @@ func (ml *messagesList) drawAuthor(builder *tview.LineBuilder, message discord.M
 
 func (ml *messagesList) updatePresenceForUser(userID discord.UserID) {
 	for _, msg := range ml.messages {
+		// delete the messages so it gets reupdated
 		if msg.Author.ID == userID {
 			delete(ml.itemByID, msg.ID)
 		}
+
+		// also do replied messages
+		if msg.ReferencedMessage != nil && msg.ReferencedMessage.Author.ID == userID {
+			delete(ml.itemByID, msg.ID)
+		}
 	}
+
+	//rebuild
 	ml.SetBuilder(ml.buildItem)
 
 }
