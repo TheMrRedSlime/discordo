@@ -1278,6 +1278,11 @@ func (ml *messagesList) reply(mention bool) {
 		return
 	}
 
+	// they cant reply to deleted messages
+	if ml.deletedIDs[message.ID] {
+		return
+	}
+
 	name := message.Author.DisplayOrUsername()
 	if member := ml.memberForMessage(*message); member != nil && member.Nick != "" {
 		name = member.Nick
@@ -1305,6 +1310,11 @@ func (ml *messagesList) editSelectedMessage() {
 		return
 	}
 
+	// cant edit deleted messages
+	if ml.deletedIDs[message.ID] {
+		return
+	}
+
 	me, _ := ml.chatView.state.Cabinet.Me()
 	if message.Author.ID != me.ID {
 		slog.Error("failed to edit message; not the author", "channel_id", message.ChannelID, "message_id", message.ID)
@@ -1318,6 +1328,15 @@ func (ml *messagesList) editSelectedMessage() {
 }
 
 func (ml *messagesList) confirmDelete() {
+
+	selectedMessage, err := ml.selectedMessage()
+
+	if err != nil {
+		if ml.deletedIDs[selectedMessage.ID] {
+			return
+		}
+	}
+
 	onChoice := func(choice string) {
 		if choice == "Yes" {
 			if command := ml.deleteSelectedMessage(); command != nil {
@@ -1337,6 +1356,10 @@ func (ml *messagesList) deleteSelectedMessage() tview.Command {
 	selectedMessage, err := ml.selectedMessage()
 	if err != nil {
 		slog.Error("failed to get selected message", "err", err)
+		return nil
+	}
+
+	if ml.deletedIDs[selectedMessage.ID] {
 		return nil
 	}
 
