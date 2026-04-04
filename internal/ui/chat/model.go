@@ -303,11 +303,7 @@ func (m *Model) Update(event tview.Event) tview.Cmd {
 		m.messageInput.SetDisabled(hasNoPerm)
 		text := "Message..."
 
-<<<<<<< HEAD
-		var focusCommand tview.Cmd
-=======
 		var focusCmd tview.Cmd
->>>>>>> upstream/main
 		if hasNoPerm {
 			text = "You do not have permission to send messages in this channel."
 		} else if m.cfg.AutoFocus {

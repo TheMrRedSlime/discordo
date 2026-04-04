@@ -46,10 +46,6 @@ func (ap *attachmentsPicker) SetItems(items []attachmentItem) {
 }
 
 func (ap *attachmentsPicker) close() tview.Cmd {
-<<<<<<< HEAD
-=======
-
->>>>>>> upstream/main
 	ap.chatView.RemoveLayer(attachmentsPickerLayerName)
 	return tview.SetFocus(ap.chatView.messagesList)
 }
