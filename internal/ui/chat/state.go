@@ -112,6 +112,7 @@ func (m *Model) onMessageCreate(message *gateway.MessageCreateEvent) tview.Cmd {
 	return m.notify(*message)
 }
 
+<<<<<<< HEAD
 func (m *Model) onPresenceUpdate(presence *gateway.PresenceUpdateEvent) {
 
 	m.messagesList.updatePresenceForUser(presence.User.ID)
@@ -131,6 +132,8 @@ func (m *Model) onPresenceUpdate(presence *gateway.PresenceUpdateEvent) {
 	}
 }
 
+=======
+>>>>>>> upstream/main
 func (m *Model) notify(message gateway.MessageCreateEvent) tview.Cmd {
 	return func() tview.Event {
 		if err := notifications.Notify(m.state, message, m.cfg); err != nil {

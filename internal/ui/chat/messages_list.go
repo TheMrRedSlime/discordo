@@ -1339,8 +1339,8 @@ func (ml *messagesList) confirmDelete() {
 
 	onChoice := func(choice string) {
 		if choice == "Yes" {
-			if command := ml.deleteSelectedMessage(); command != nil {
-				command()
+			if cmd := ml.deleteSelectedMessage(); cmd != nil {
+				cmd()
 			}
 		}
 	}

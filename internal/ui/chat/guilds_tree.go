@@ -315,6 +315,7 @@ func (gt *guildsTree) createChannelNodes(node *tview.TreeNode, channels []discor
 	}
 }
 
+<<<<<<< HEAD
 func (gt *guildsTree) promoteDMChannel(channelID discord.ChannelID) {
 	node, ok := gt.channelNodeByID[channelID]
 	if !ok || gt.dmRootNode == nil {
@@ -326,6 +327,8 @@ func (gt *guildsTree) promoteDMChannel(channelID discord.ChannelID) {
 	gt.dmRootNode.SetChildren(append([]*tview.TreeNode{node}, children...))
 }
 
+=======
+>>>>>>> upstream/main
 func (gt *guildsTree) onSelected(node *tview.TreeNode) tview.Cmd {
 	if len(node.GetChildren()) != 0 {
 		node.SetExpanded(!node.IsExpanded())
