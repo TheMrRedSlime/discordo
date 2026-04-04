@@ -31,7 +31,7 @@ func (m *Model) onRaw(event *ws.RawEvent) {
 	)
 }
 
-func (m *Model) onReady(event *gateway.ReadyEvent) tview.Command {
+func (m *Model) onReady(event *gateway.ReadyEvent) tview.Cmd {
 	// Rebuild indexes from scratch so reconnects and account switches do not
 	// retain pointers to detached tree nodes.
 	m.guildsTree.resetNodeIndex()
@@ -97,7 +97,7 @@ func (m *Model) onReady(event *gateway.ReadyEvent) tview.Command {
 	return tview.SetFocus(m.guildsTree)
 }
 
-func (m *Model) onMessageCreate(message *gateway.MessageCreateEvent) tview.Command {
+func (m *Model) onMessageCreate(message *gateway.MessageCreateEvent) tview.Cmd {
 	selectedChannel := m.SelectedChannel()
 	if !message.GuildID.IsValid() {
 		m.guildsTree.promoteDMChannel(message.ChannelID)
@@ -131,7 +131,7 @@ func (m *Model) onPresenceUpdate(presence *gateway.PresenceUpdateEvent) {
 	}
 }
 
-func (m *Model) notify(message gateway.MessageCreateEvent) tview.Command {
+func (m *Model) notify(message gateway.MessageCreateEvent) tview.Cmd {
 	return func() tview.Event {
 		if err := notifications.Notify(m.state, message, m.cfg); err != nil {
 			slog.Error("failed to notify", "err", err, "channel_id", message.ChannelID, "message_id", message.ID)
