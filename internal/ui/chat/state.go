@@ -176,15 +176,6 @@ func (m *Model) onMessageDelete(message *gateway.MessageDeleteEvent) {
 		return
 	}
 
-	//show deleted messages
-
-	if m.cfg.ShowDeletedMessages {
-		m.messagesList.deletedIDs[message.ID] = true
-		delete(m.messagesList.itemByID, message.ID)
-		m.messagesList.invalidateRows()
-		return
-	}
-
 	prevCursor := m.messagesList.Cursor()
 	m.messagesList.deleteMessage(deletedIndex)
 
